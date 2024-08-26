@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Графічний редактор</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f0f0f0;
+            height: 100vh;
+        }
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            padding: 10px;
+            background-color: #ffffff;
+            width: 100%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            justify-content: center;
+        }
+        .toolbar select, .toolbar input {
+            padding: 5px;
+            font-size: 16px;
+        }
+        #drawingArea {
+            width: 100%;
+            height: calc(100vh - 60px);
+            background-color: #ffffff;
+            position: relative;
+            border: 2px solid #333;
+            cursor: crosshair;
+        }
+        .shape {
+            position: absolute;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="toolbar">
+        <select id="shapeSelect">
+            <option value="rectangle">Прямокутник</option>
+            <option value="circle">Коло</option>
+        </select>
+        <input type="color" id="colorPicker" value="#ff0000">
+    </div>
+
+    <div id="drawingArea"></div>
+
+    <script>
+        const shapeSelect = document.getElementById('shapeSelect');
+        const colorPicker = document.getElementById('colorPicker');
+        const drawingArea = document.getElementById('drawingArea');
+
+        let isDrawing = false;
+        let startX, startY;
+
+        drawingArea.addEventListener('mousedown', (event) => {
+            isDrawing = true;
+            startX = event.offsetX;
+            startY = event.offsetY;
+        });
+
+        drawingArea.addEventListener('mouseup', (event) => {
+            if (!isDrawing) return;
+
+            const endX = event.offsetX;
+            const endY = event.offsetY;
+
+            const shape = document.createElement('div');
+            shape.className = 'shape';
+            shape.style.backgroundColor = colorPicker.value;
+
+            if (shapeSelect.value === 'rectangle') {
+                shape.style.left = Math.min(startX, endX) + 'px';
+                shape.style.top = Math.min(startY, endY) + 'px';
+                shape.style.width = Math.abs(endX - startX) + 'px';
+                shape.style.height = Math.abs(endY - startY) + 'px';
+            } else if (shapeSelect.value === 'circle') {
+                const diameter = Math.max(Math.abs(endX - startX), Math.abs(endY - startY));
+                shape.style.left = startX - diameter / 2 + 'px';
+                shape.style.top = startY - diameter / 2 + 'px';
+                shape.style.width = diameter + 'px';
+                shape.style.height = diameter + 'px';
+                shape.style.borderRadius = '50%';
+            }
+
+            drawingArea.appendChild(shape);
+            isDrawing = false;
+        });
+    </script>
+
+</body>
+</html>
